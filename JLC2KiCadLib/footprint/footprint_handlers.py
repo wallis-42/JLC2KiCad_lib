@@ -225,7 +225,7 @@ def h_PAD(data, kicad_mod, footprint_info):
         points = []
         for i, coord in enumerate(data[9].split(" ")):
             points.append(mil2mm(coord) - at[i % 2])
-        primitives = [Polygon(nodes=zip(points[::2], points[1::2], strict=True))]
+        primitives = [Polygon(nodes=zip(points[::2], points[1::2]))]
         size = [0.1, 0.1]
 
         drill_size = 1 if drill_offset == 0 else [drill_diameter, drill_offset]
