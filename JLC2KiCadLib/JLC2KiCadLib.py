@@ -1,6 +1,8 @@
 import argparse
 import json
 import logging
+import sys
+import traceback
 from importlib.metadata import version as pkg_version
 
 import requests
@@ -209,8 +211,36 @@ def main():
 
     helper.set_logging(args.logging_level, args.log_file)
 
+    # Each component is isolated: one bad part (a KeyError/IndexError/TypeError
+    # from an EasyEDA data shape the handlers don't expect, a network hiccup,
+    # etc.) is logged and skipped instead of killing every part still queued
+    # after it.
+    failed = []
+    succeeded = []
+
     for component in args.components:
-        add_component(component, args)
+        try:
+            add_component(component, args)
+            succeeded.append(component)
+        except Exception:
+            failed.append(component)
+            logging.error(f"*** {component} FAILED - skipping it and continuing ***")
+            logging.error(traceback.format_exc())
+
+    print("\n==================== SUMMARY ====================")
+    print(f"Succeeded ({len(succeeded)}): {' '.join(succeeded)}")
+    if failed:
+        print(f"Failed ({len(failed)}): {' '.join(failed)}")
+        print(
+            "See the traceback(s) above (or the log file if you passed "
+            "--log_file) for the exact exception on each failed part."
+        )
+    else:
+        print("All components succeeded.")
+    print("==================================================")
+
+    if failed:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

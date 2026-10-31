@@ -298,7 +298,11 @@ def h_ARC(data, kicad_mod, footprint_info):
     """
 
     width = data[0]
-    layer = layer_correspondance[data[1]]
+    try:
+        layer = layer_correspondance[data[1]]
+    except KeyError:
+        logging.exception("footprint handler, h_ARC : layer correspondance not found")
+        layer = "F.SilkS"
     svg_path = data[3]
 
     # Parse SVG path
@@ -535,7 +539,16 @@ def svg_arc_to_points(x1, y1, rx, ry, rotation, large_arc_flag, sweep_flag, x2, 
 
 
 def h_SOLIDREGION(data, kicad_mod, footprint_info):
-    layer = "Edge.Cuts" if data[3] == "npth" else layer_correspondance[data[0]]
+    if data[3] == "npth":
+        layer = "Edge.Cuts"
+    else:
+        try:
+            layer = layer_correspondance[data[0]]
+        except KeyError:
+            logging.exception(
+                "footprint handler, h_SOLIDREGION : layer correspondance not found"
+            )
+            layer = "F.SilkS"
 
     path = data[2]
     points = []
@@ -655,7 +668,11 @@ def h_RECT(data, kicad_mod, footprint_info):
     start = [Xstart, Ystart]
     end = [Xstart + Xdelta, Ystart + Ydelta]
     width = mil2mm(data[7])
-    layer = layer_correspondance[data[4]]
+    try:
+        layer = layer_correspondance[data[4]]
+    except KeyError:
+        logging.exception("footprint handler, h_RECT : layer correspondance not found")
+        layer = "F.SilkS"
 
     update_crtyd_bounds(
         footprint_info,

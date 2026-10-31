@@ -1,0 +1,16 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+
+# Logs this project writes
+JLC2KiCad_lib.log
+*.log
+
+# Generated library output (left here from manual test runs; the real
+# libraries this tool produces live under -dir elsewhere)
+JLC2KiCad_lib/
+AsDownloaded/
+
+# Editor/OS cruft
+.vscode/
+Thumbs.db
